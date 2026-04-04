@@ -1,0 +1,16 @@
+[project]
+name = "dl-diadem"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "gputil>=1.4.0",
+    "jupyter>=1.1.1",
+    "matplotlib>=3.10.8",
+    "opencv-python>=4.13.0.92",
+    "py-cpuinfo>=9.0.0",
+    "scikit-learn>=1.8.0",
+    "seaborn>=0.13.2",
+    "tensorflow==2.19",
+]
