@@ -13,4 +13,7 @@ wheels/
 Data/
 .ipynb_checkpoints/
 uv.lock
+models/
+*.keras
+*.h5
 

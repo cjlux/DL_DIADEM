@@ -13,6 +13,12 @@ from cpuinfo import get_cpu_info
 import tensorflow as tf
 import GPUtil
 
+def cpu_gpu():
+    device = f"CPU [{get_cpu_info()['brand_raw']}]"
+    if tf.config.list_physical_devices('GPU'):
+        device += f" - GPU {[g.name for g in GPUtil.getGPUs()]}"
+    return device
+    
 def display_history_stat(hist:list):
     metrics = ('accuracy', 'loss', 'val_accuracy', 'val_loss')
     for m in metrics:
@@ -109,6 +115,7 @@ def plot_loss_accuracy(hist:list,
                        single_legend:bool= True,
                        figsize=(15,5),
                        message='',
+                       device_info:bool=True,
                        ret:bool=False):
     '''
     Plot training & validation loss & accuracy values, giving an argument
@@ -129,13 +136,13 @@ def plot_loss_accuracy(hist:list,
 
     fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, figsize=figsize)
 
-    if tf.config.list_physical_devices('GPU'):
-        device = f"GPU [{GPUtil.getGPUs()[0].name}]"
-    else:
-        device = f"CPU [{get_cpu_info()['brand_raw']}]"
+    # the title:
+    device = cpu_gpu()
+    title = message
+    if message and device_info: title += ' - ' 
+    if device_info: title += f' Trained on {device}'
+    fig.suptitle(title)
     
-    fig.suptitle(f"Model <{message}> trained on {device}")
-
     for (i, h) in enumerate(hist):
         if h.history.get('accuracy') and training:
             ax1.plot(epoch_array, h.history['accuracy'][:nb_epoch], 'o-', markersize=4,
@@ -157,7 +164,7 @@ def plot_loss_accuracy(hist:list,
         ax1.legend(custom_lines, ['Train', 'Valid'], loc='lower right')
     else:
         ax1.legend(loc='lower right')
-    #ax1.set_xticks(np.arange(1, len(h.epoch)+1))
+    ax1.set_xticks(np.arange(1, len(h.epoch)+1))
     
     
     # Plot training & validation loss values
@@ -182,7 +189,7 @@ def plot_loss_accuracy(hist:list,
         ax2.legend(custom_lines, ['Train', 'Valid'], loc='upper right')
     else:
         ax2.legend(loc='upper right')
-    #ax2.set_xticks(np.arange(1, len(h.epoch)+1))
+    ax2.set_xticks(np.arange(1, len(h.epoch)+1))
 
     fig.tight_layout()
 
@@ -267,6 +274,7 @@ def plot_loss_accuracy_vs_hyperparam(hist:list,
                                      plot_train:bool=True, 
                                      plot_valid:bool=True,
                                      figsize=(15,5),
+                                     device_info:bool=True,
                                      ret:bool=False):
     '''
     Plot training & validation loss & accuracy values, giving an argument
@@ -288,11 +296,11 @@ def plot_loss_accuracy_vs_hyperparam(hist:list,
     
     fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, figsize=figsize)
 
-    if tf.config.list_physical_devices('GPU'):
-        device = f"GPU [{GPUtil.getGPUs()[0].name}]"
-    else:
-        device = f"CPU [{get_cpu_info()['brand_raw']}]"
-    fig.suptitle(f"Model trained on {device}")
+    # the title:
+    device = cpu_gpu()
+    title = message
+    if device_info: title += f'Trained on {device}'
+    fig.suptitle(title)
     
     if plot_train and plot_valid: 
         line = 'o:'
@@ -322,7 +330,7 @@ def plot_loss_accuracy_vs_hyperparam(hist:list,
     ax1.grid(which='major', color='xkcd:cool grey',  linestyle='-',  alpha=0.7)
     ax1.grid(which='minor', color='xkcd:light grey', linestyle='--', alpha=0.5)
     ax1.legend(loc='lower right')
-    #ax1.set_xticks(np.arange(1, len(h.epoch)+1))
+    ax1.set_xticks(np.arange(1, len(h.epoch)+1))
     
     
     # Plot training & validation loss values
@@ -347,7 +355,7 @@ def plot_loss_accuracy_vs_hyperparam(hist:list,
     ax2.grid(which='major', color='xkcd:cool grey',  linestyle='-',  alpha=0.7)
     ax2.grid(which='minor', color='xkcd:light grey', linestyle='--', alpha=0.5)
     ax2.legend(loc='upper right')
-    #ax2.set_xticks(np.arange(1, len(h.epoch)+1))
+    ax2.set_xticks(np.arange(1, len(h.epoch)+1))
 
     if ret: 
         return fig
