@@ -1,4 +1,4 @@
-# version 2.4 - 2026/03/30
+# version 2.5 - 2026/04/13
 
 import numpy as np
 from numpy import ndarray
@@ -32,28 +32,32 @@ def elapsed_time_since(t0):
     s = int((t - h*3600 -m*60))
     return f"Elapsed time {t}s -> {h:02d}:{m:02d}:{s:02d}"
     
-def plot_proportion_bar(proportions:dict, class_names, figsize=(6,4), ret:bool=False):
+def plot_proportion_bar(proportions:dict, class_rank, figsize=(6,4), message='', ret:bool=False):
     '''
     To plot propotion of classes in different datasets.
     proportion: the dictionnary {<dataset name>: <[number of class in teh dataset]>}
     '''
-    width = 0.45
-    coeff = 0
-    x = np.arange(len(class_names))  # the label locations on x axis
+    width = 0.95/(len(proportions.keys()))
+    
+    coeff = -1/len(proportions.keys()) if len(proportions.keys()) != 1 else 0.5
+    x = np.arange(len(class_rank))  # the label ranks on x axis
     fig, ax = plt.subplots(figsize=figsize, layout='constrained')
+    
     # Add some text for labels, title and custom x-axis tick labels, etc.
     for name, values in proportions.items():
         offset = width * coeff
         rects = ax.bar(x + offset, values, width, label=name)
-        ax.bar_label(rects, padding=3, fontsize=8)
+        ax.bar_label(rects, label_type='edge', padding=-10, fontsize=8, color='w',weight='bold')
         coeff += 1
+        
     ax.set_ylabel('number of digits')
     ax.set_xlabel('Classes')
-    ax.set_title('Proportion of digits in dataset')
-    ax.set_xticks(x + width/2, class_names)
+    title = message if message else 'Proportion of digits in dataset' 
+    ax.set_title(title)
+    ax.set_xticks(x + width/2, class_rank)
+    ax.set_xlim(-0.5, len(class_rank))
     ax.legend()
-    if ret:
-        return fig
+    if ret: return fig
 
 def split_stratified_into_train_val_test(dataset: (ndarray, ndarray), 
                                          frac_train:float=0.7, 
@@ -109,9 +113,11 @@ def split_stratified_into_train_val_test(dataset: (ndarray, ndarray),
 
 
 def plot_loss_accuracy(hist:list, 
-                       max_epoch:float = None,
-                       min_acc:float=None,  max_acc:float=None, min_loss:float=None, max_loss:float=None, 
-                       training:bool=True, 
+                       max_epoch:int = None,
+                       min_acc:float=None, max_acc:float=None, 
+                       min_loss:float=None, max_loss:float=None, 
+                       plot_train:bool=True, 
+                       plot_valid:bool=True,
                        single_legend:bool= True,
                        figsize=(15,5),
                        message='',
@@ -124,36 +130,52 @@ def plot_loss_accuracy(hist:list,
     
     custom_lines = [Line2D([0], [0], color='blue', lw=1, marker='o'),
                     Line2D([0], [0], color='orange', lw=1, marker='o')]
-    val_colors = ('orange', 'gold', 'goldenrod', 'darkgoldenrod', 'lightcoral', 'firebrick')
-        
+    train_color = ('blue', 'royalblue', 'cornflowerblue', 'dodgerblue', 'deepskyblue', 'lightskyblue', 'paleturquoise')
+    val_color   = ('orange', 'gold', 'goldenrod', 'darkgoldenrod', 'lightcoral', 'firebrick', 'maroon')
+
+    title_acc = {(True, True): "Model Accuracy",
+                 (True, False): "Training Accuray",
+                 (False, True): "Validation Accuracy"}
+    title_val = {(True, True): "Model Loss",
+                 (True, False): "Training Loss",
+                 (False, True): "Validation Loss"}
+    
     if not isinstance(hist, list): hist = [hist]
-
-    if max_epoch is None:
-        epoch_array = np.array(hist[0].epoch)+1
-    else:
-        epoch_array = np.arange(1, max_epoch+1)
-    nb_epoch = len(epoch_array)
-
     fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, figsize=figsize)
-
+    fig.subplots_adjust(left=0.1, right=0.9, top=0.83, bottom=0.1)
+    
     # the title:
     device = cpu_gpu()
-    title = message
-    if message and device_info: title += ' - ' 
-    if device_info: title += f' Trained on {device}'
-    fig.suptitle(title)
-    
+    if message: fig.suptitle(message, fontsize=12)
+    if device_info: 
+        fig.text(0.5, 0.9, device, horizontalalignment='center', fontsize=10, color='gray')
+
+    #
+    # Plot training & validation accuracy
+    #
     for (i, h) in enumerate(hist):
-        if h.history.get('accuracy') and training:
-            ax1.plot(epoch_array, h.history['accuracy'][:nb_epoch], 'o-', markersize=4,
-                     color='blue', label=f'train-{i:01d}')
-        if h.history.get('val_accuracy'):
-            val_color = val_colors[i % len(val_colors)]
-            ax1.plot(epoch_array, h.history['val_accuracy'][:nb_epoch], 'o-', markersize=4,
-                     color=val_color, label=f'val-{i:01d}')
-    ax1.set_title('Model accuracy')
-    ax1.set_ylabel('Accuracy')
-    ax1.set_xlabel('Epoch') 
+        
+        elaps_time  = h.params.get('elaps', None)
+        epoch_array = np.array(h.epoch)+1 if max_epoch is None else np.arange(1, max_epoch+1)
+        nb_epoch    = h.params.get('nb_epoch', len(epoch_array))
+
+        if elaps_time: elaps_time = elaps_time.split()[2]
+        
+        if h.history.get('accuracy') and plot_train:
+            label = f'train-#{i+1:1d}'
+            if elaps_time: label += f' - {elaps_time}'
+            color = train_color[i % len(train_color)]
+            ax1.plot(epoch_array, h.history['accuracy'][:nb_epoch], 'o-', markersize=4, color=color, label=label)
+            
+        if h.history.get('val_accuracy') and plot_valid:
+            label = f'valid-#{i+1:1d}'
+            if elaps_time: label += f' - {elaps_time}'
+            color = val_color[i % len(val_color)]
+            ax1.plot(epoch_array, h.history['val_accuracy'][:nb_epoch], 'o-', markersize=4, color=color, label=label)
+    
+    ax1.set_title(title_acc[(plot_train, plot_valid)])
+    ax1.set_ylabel('Accuracy', fontsize=10)
+    ax1.set_xlabel('Epoch', fontsize=10) 
     y_min, y_max = ax1.get_ylim()
     if min_acc is not None: y_min = min_acc
     if max_acc is not None: y_max = max_acc
@@ -163,22 +185,35 @@ def plot_loss_accuracy(hist:list,
     if  single_legend:
         ax1.legend(custom_lines, ['Train', 'Valid'], loc='lower right')
     else:
-        ax1.legend(loc='lower right')
-    ax1.set_xticks(np.arange(1, len(h.epoch)+1))
+        ax1.legend(loc='lower right', framealpha=0.5)
+    if nb_epoch <= 10: ax1.set_xticks(np.arange(1, nb_epoch+1))
     
-    
+    #
     # Plot training & validation loss values
+    #
     for (i, h) in enumerate(hist):
-        if h.history.get('loss') and training:
-            ax2.plot(epoch_array, h.history['loss'][:nb_epoch], 'o-', markersize=4,
-                     color='blue', label=f'train-{i:01d}')
-        if h.history.get('val_loss'):
-            val_color = val_colors[i % len(val_colors)]
-            ax2.plot(epoch_array, h.history['val_loss'][:nb_epoch], 'o-', markersize=4,
-                     color=val_color, label=f'val-{i:01d}')
-    ax2.set_title('Model loss')
-    ax2.set_ylabel('Loss')
-    ax2.set_xlabel('Epoch')
+        
+        elaps_time  = h.params.get('elaps', None)
+        epoch_array = np.array(h.epoch)+1 if max_epoch is None else np.arange(1, max_epoch+1)
+        nb_epoch    = h.params.get('nb_epoch', len(epoch_array))
+
+        if elaps_time: elaps_time = elaps_time.split()[2]
+        
+        if h.history.get('loss') and plot_train:
+            label = f'train-#{i+1:1d}'
+            if elaps_time: label += f' - {elaps_time}'
+            color = train_color[i % len(train_color)]
+            ax2.plot(epoch_array, h.history['loss'][:nb_epoch], 'o-', markersize=4, color=color, label=label)
+            
+        if h.history.get('val_loss') and plot_valid:
+            label = f'valid-#{i+1:1d}'
+            if elaps_time: label += f' - {elaps_time}'
+            color = val_color[i % len(val_color)]
+            ax2.plot(epoch_array, h.history['val_loss'][:nb_epoch], 'o-', markersize=4, color=color, label=label)
+    
+    ax2.set_title(title_val[(plot_train, plot_valid)])
+    ax2.set_ylabel('Loss', fontsize=10)
+    ax2.set_xlabel('Epoch', fontsize=10)
     y_min, y_max = ax2.get_ylim()
     if min_loss is not None: y_min = min_loss
     if max_loss is not None: y_max = max_loss
@@ -188,14 +223,12 @@ def plot_loss_accuracy(hist:list,
     if  single_legend:
         ax2.legend(custom_lines, ['Train', 'Valid'], loc='upper right')
     else:
-        ax2.legend(loc='upper right')
-    ax2.set_xticks(np.arange(1, len(h.epoch)+1))
-
-    fig.tight_layout()
-
+        ax2.legend(loc='upper right', framealpha=0.5)
+    if nb_epoch <= 10: ax2.set_xticks(np.arange(1, nb_epoch+1))
+    
     if ret:
         return fig
-
+        
 def plot_images(image_array:np.ndarray, 
                 R:int, C:int, r:int=0,
                 figsize:tuple=None, 
@@ -266,19 +299,27 @@ def scan_dir(path):
     return tree
 
 def plot_loss_accuracy_vs_hyperparam(hist:list, 
-                                     train_data_set_size:int,
+                                     param:str='batch_size',
                                      min_acc:float=None,
                                      max_acc:float=None,
                                      min_loss:float=None,
                                      max_loss:float=None, 
                                      plot_train:bool=True, 
                                      plot_valid:bool=True,
-                                     figsize=(15,5),
+                                     figsize=(15,5),   
+                                     message='',
                                      device_info:bool=True,
                                      ret:bool=False):
     '''
     Plot training & validation loss & accuracy values, giving an argument
-    'hist' of type 'tensorflow.python.keras.callbacks.History'. 
+    'hist' of type: list of tensorflow.python.keras.callbacks.History. 
+
+    Parameters:
+    param: the name of the paramter used to display the legend
+    min_acc, max_acc: min and max for plotting training accuracy
+    min_loss, max_loss: min and max for plotting training loss
+    plot_train: whether to plot train accuracy & loss or not (default: True)
+    plot_val: whether to plot validation accuracy & loss or not (default: True)
     '''
     
     custom_lines = [Line2D([0], [0], color='blue', lw=1, marker='o'),
@@ -286,21 +327,22 @@ def plot_loss_accuracy_vs_hyperparam(hist:list,
     colors = ('red', 'green', 'blue', 'orange', 'cyan', 'magenta')
 
     title_acc = {(True, True): "Model Accuracy",
-             (True, False): "training Accuray",
-             (False, True): "Validation Accuracy"}
+                 (True, False): "training Accuray",
+                 (False, True): "Validation Accuracy"}
     title_val = {(True, True): "Model Loss",
-             (True, False): "training Loss",
-             (False, True): "Validation Loss"}
+                 (True, False): "training Loss",
+                 (False, True): "Validation Loss"}
 
     if not isinstance(hist, list): hist = [hist]
     
     fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, figsize=figsize)
+    fig.subplots_adjust(left=0.1, right=0.9, top=0.83, bottom=0.1)
 
     # the title:
     device = cpu_gpu()
-    title = message
-    if device_info: title += f'Trained on {device}'
-    fig.suptitle(title)
+    if message: fig.suptitle(message, fontsize=12)
+    if device_info: 
+        fig.text(0.5, 0.9, device, horizontalalignment='center', fontsize=10, color='gray')
     
     if plot_train and plot_valid: 
         line = 'o:'
@@ -309,17 +351,21 @@ def plot_loss_accuracy_vs_hyperparam(hist:list,
 
     # Plot training & validation accuracy
     for (i, h) in enumerate(hist):
+        param_value = h.params[param]
         nb_epoch    = h.params['nb_epoch']
-        batch_size  = h.params['batch_size']
         elaps_time  = h.params['elaps'].split()[2]
         epoch_array = np.array(h.epoch)+1
 
         if h.history.get('accuracy') and plot_train:
+            label_prefix = '' if not plot_valid else 'train-'
+            label_prefix += f'{param}:{param_value}'
             ax1.plot(epoch_array, h.history['accuracy'], line, markersize=4,
-                     color=colors[i], label=f'train - batch_size:{batch_size} - {elaps_time}')
+                     color=colors[i], label=label_prefix + f' - {elaps_time}')
         if h.history.get('val_accuracy') and plot_valid:
+            label_prefix = '' if not plot_train else 'valid-'
+            label_prefix += f'{param}:{param_value}'
             ax1.plot(epoch_array, h.history['val_accuracy'], 'o-', markersize=4,
-                     color=colors[i], label=f'valid - batch_size:{batch_size} - {elaps_time}')
+                     color=colors[i], label=label_prefix + f' - {elaps_time}')
     ax1.set_title(title_acc[(plot_train, plot_valid)])
     ax1.set_ylabel('Accuracy')
     ax1.set_xlabel('Epoch') 
@@ -330,21 +376,25 @@ def plot_loss_accuracy_vs_hyperparam(hist:list,
     ax1.grid(which='major', color='xkcd:cool grey',  linestyle='-',  alpha=0.7)
     ax1.grid(which='minor', color='xkcd:light grey', linestyle='--', alpha=0.5)
     ax1.legend(loc='lower right')
-    ax1.set_xticks(np.arange(1, len(h.epoch)+1))
-    
+    if nb_epoch <= 10: ax1.set_xticks(np.arange(1, len(h.epoch)+1))
     
     # Plot training & validation loss values
     for (i, h) in enumerate(hist):
-        nb_epoch   = h.params['nb_epoch']
-        batch_size = h.params['batch_size']
-        elaps_time = h.params['elaps'].split()[2]
+        param_value = h.params[param]
+        nb_epoch    = h.params['nb_epoch']
+        elaps_time  = h.params['elaps'].split()[2]
         epoch_array = np.array(h.epoch)+1
+
         if h.history.get('loss') and plot_train:
+            label_prefix = '' if not plot_valid else 'train '
+            label_prefix += f'{param}:{param_value}'
             ax2.plot(epoch_array, h.history['loss'], line, markersize=4,
-                     color=colors[i], label=f'train - batch_size:{batch_size} - {elaps_time}')
+                     color=colors[i], label=label_prefix + f' - {elaps_time}')
         if h.history.get('val_loss') and plot_valid:
+            label_prefix = '' if not plot_train else 'valid '
+            label_prefix += f'{param}:{param_value}'
             ax2.plot(epoch_array, h.history['val_loss'], 'o-', markersize=4,
-                     color=colors[i], label=f'valid - batch_size:{batch_size} - {elaps_time}')
+                     color=colors[i], label=label_prefix + f' - {elaps_time}')
     ax2.set_title(title_val[(plot_train, plot_valid)])
     ax2.set_ylabel('Loss')
     ax2.set_xlabel('Epoch')
@@ -355,7 +405,8 @@ def plot_loss_accuracy_vs_hyperparam(hist:list,
     ax2.grid(which='major', color='xkcd:cool grey',  linestyle='-',  alpha=0.7)
     ax2.grid(which='minor', color='xkcd:light grey', linestyle='--', alpha=0.5)
     ax2.legend(loc='upper right')
-    ax2.set_xticks(np.arange(1, len(h.epoch)+1))
+    if nb_epoch <= 10: ax2.set_xticks(np.arange(1, len(h.epoch)+1))
 
     if ret: 
         return fig
+        
