@@ -1,0 +1,9 @@
+[project]
+name = "labelimages"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.5"
+dependencies = [
+    "labelimg>=1.8.6",
+]

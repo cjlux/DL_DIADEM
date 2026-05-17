@@ -11,9 +11,13 @@ wheels/
 
 # JLC
 Data/
+.vscode
 .ipynb_checkpoints/
 uv.lock
 models/
 *.keras
 *.h5
-
+*.cache
+ObjectDetection/Training/Results/*.jpg
+ObjectDetection/Training/YOLO-trained/*
+*.pt
