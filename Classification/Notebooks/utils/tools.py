@@ -404,7 +404,7 @@ def plot_loss_accuracy_vs_hyperparam(hist: list,
     if ret: return fig
 
 
-def show_conf_matrix(actual_label, pred_label, class_label, figsize=(8,7), cmap=colormaps['Blues'], ret=False):
+def show_conf_matrix(actual_label, pred_label, class_label, figsize=(8,7), cmap=colormaps['Blues'], xticks_rot='horizontal', ret=False):
     ''' 
     To display the confusion matrix.
 
@@ -412,9 +412,10 @@ def show_conf_matrix(actual_label, pred_label, class_label, figsize=(8,7), cmap=
       actual_label: the array of the actual labels (scalars)
       pred_label:   the array of the predicted labels (scalars)
       class_label:  the array of the label of the classes
-      figsize:         the tuple(witdh, height) of the width and height of the figure
-      cmap:            the desired color map (default=colormaps[name]['Blues'])
-      ret:             whether to return the fig or not (useful for marimo)
+      figsize:      the tuple(witdh, height) of the width and height of the figure
+      cmap:         the desired color map (default=colormaps[name]['Blues'])
+      xticks_rot:   whether to display the X axis labels 'horizontal' or 'vertical' (defaut: 'horizontal')
+      ret:          whether to return the fig or not (useful for marimo)
     '''
     fig  = plt.figure(figsize=figsize)
     axis = plt.axes()
@@ -429,7 +430,6 @@ def show_conf_matrix(actual_label, pred_label, class_label, figsize=(8,7), cmap=
                                             ax=axis,
                                             cmap=cmap,
                                             display_labels=class_label, 
-                                            #xticks_rotation='vertical',
+                                            xticks_rotation=xticks_rot,
                                             colorbar=False);
     if ret: return fig
-
