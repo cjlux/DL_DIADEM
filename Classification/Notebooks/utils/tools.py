@@ -103,7 +103,7 @@ def plot_proportion_bar(prop: dict,
     Parameters:
       prop         the dictionnary {<name of the dataset>: <[# of 1, # of 2 ... in the dataset]>}
       class_rank   the list of the class labels (displayed on the X axis)
-      figsize      the sise of the display (default: (6,4)
+      figsize      the size of the display (default: (6,4)
       title        title to display (defaut is empty title 'Proportion of digits in dataset')
       ret          wether to return the fig or not (useful for marimo)
     '''
@@ -187,8 +187,20 @@ def plot_loss_accuracy(hist: list,
                        device_info: bool=True,
                        ret: bool=False):
     '''
-    Plot training & validation loss & accuracy values, giving an argument
-    'hist' of type 'tensorflow.python.keras.callbacks.History'. 
+    Plot training & validation loss & accuracy values versus the epoch.
+
+    Arguments:
+      hist:               the data returned by A call model.fit() 
+      max_epoch:          the max value of epoch on the X axis (defautlt: None)
+      min_acc, max_acc:   the min & max values of accuracy (default: None)
+      min_loss, max_loss: the min & max values of loss (default: None)
+      plot_train:         whether to plot train_acc & train_loss or not (default:True)
+      plot_valid:         whether to plot valid_acc & valid_loss or not (default:True)
+      single_legend:      whether to display a single legend or all the legends (default: True)
+      figsize:            a tuple giving the size of the figure (default: (15,5))
+      message:            the title of the figure (default: '')
+      device_info:        whether to display info on CPU/GPU under the title (default: True)
+      ret:                wether to return the fig or not (useful for marimo)
     '''
     
     custom_lines = [Line2D([0], [0], color='blue', lw=1, marker='o'),
