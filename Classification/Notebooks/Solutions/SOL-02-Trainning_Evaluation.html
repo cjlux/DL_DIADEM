@@ -8993,7 +8993,7 @@ scan_dir(path, tag=None, sortbydate=False)
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Load the choosen trained model file:</p>
+<p>Load the chosen trained model file:</p>
 </div>
 </div>
 </div>
@@ -9667,7 +9667,7 @@ Saving trained model in &lt;model/DNN_seed-1234_epochs-25_batchsize-32__earlysto
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <span style="color:Blue; font-family:arial; font-size:11pt;">
     In the cell bellow you can copy/paste/modify previous cells:<br/>
-    - to load the trained model file choosen by its rank in the <span style="font-family:monospace; background-color: #EBEBEB;"> scan_dir </span> output,<br/>
+    - to load the trained model file chosen by its rank in the <span style="font-family:monospace; background-color: #EBEBEB;"> scan_dir </span> output,<br/>
     - to evaluate its accuracy &amp; loss against the test dataset<br/>
     - to show its confusion matrix<br/>
     - and to print the "classification repport".
@@ -9692,7 +9692,7 @@ Saving trained model in &lt;model/DNN_seed-1234_epochs-25_batchsize-32__earlysto
 <span class="c1"># ask to the user which model to load:</span>
 <span class="n">rank</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">input</span><span class="p">(</span><span class="s1">'</span><span class="se">\n</span><span class="s1">rank of the model to load? '</span><span class="p">)</span> <span class="p">)</span>
 
-<span class="c1"># Load the choosen model:</span>
+<span class="c1"># Load the chosen model:</span>
 <span class="n">trained_file</span> <span class="o">=</span> <span class="n">tree</span><span class="p">[</span><span class="n">rank</span><span class="p">]</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'loading trained model from &lt;</span><span class="si">{</span><span class="n">trained_file</span><span class="si">}</span><span class="s1">&gt;'</span><span class="p">)</span>
 <span class="n">model</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">trained_file</span><span class="p">)</span>
@@ -9910,7 +9910,7 @@ Saving trained model in &lt;model/DNN_seed-1234_drop-0.4_epochs-25_batchsize-32_
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <span style="color:Blue; font-family:arial; font-size:11pt;">
     In the cell bellow you can copy/paste/modify previous cells:<br/>
-    - to load the trained model file choosen by its rank in the <i>scan_dir</i> output,<br/>
+    - to load the trained model file chosen by its rank in the <i>scan_dir</i> output,<br/>
     - to evaluate its accuracy &amp; loss with the test dataset,<br/>
     - to show its confusion matrix<br/>
     - and print the "classification repport".
@@ -9935,7 +9935,7 @@ Saving trained model in &lt;model/DNN_seed-1234_drop-0.4_epochs-25_batchsize-32_
 <span class="c1"># ask to the user which model to load:</span>
 <span class="n">rank</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">input</span><span class="p">(</span><span class="s1">'</span><span class="se">\n</span><span class="s1">rank of the model to load? '</span><span class="p">)</span> <span class="p">)</span>
 
-<span class="c1"># Load the choosen model:</span>
+<span class="c1"># Load the chosen model:</span>
 <span class="n">trained_file</span> <span class="o">=</span> <span class="n">tree</span><span class="p">[</span><span class="n">rank</span><span class="p">]</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'loading trained model from &lt;</span><span class="si">{</span><span class="n">trained_file</span><span class="si">}</span><span class="s1">&gt;'</span><span class="p">)</span>
 <span class="n">model</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">trained_file</span><span class="p">)</span>
