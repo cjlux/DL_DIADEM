@@ -133,19 +133,21 @@ def split_stratified_into_train_val_test(dataset: (np.ndarray, np.ndarray),
                                          frac_test: float=0.15, 
                                          seed: float=None): 
     '''
-    Splits a numpy dataset (data, label) into three subsets: train, val, and test
+    Splits a numpy dataset (data, label) into 3 subsets: train, val, and test
     following fractional ratios provided, where each subset is stratified by the labels array. 
     Splitting into 3 datasets is achieved by running the scikit-learn train_test_split() twice.
 
     Parameters:
-      dataset: the dataset to split, as a tuple (data array, label array)
-      frac_train, frac_val, frac_test  : The ratios with which the dataset will be split into 
-             train, val, and test data. The values should be expressed as float fractions 
-             and should sum to 1.0.
-      seed:    the seed to pass to train_test_split().
+      dataset:     The dataset to split, as a tuple (data array, label array)
+      frac_train, 
+      frac_val, 
+      frac_test  : The ratios with which the dataset will be split into 
+                   train, val, and test data. The values should be expressed as float and 
+                   should sum to 1.0.
+      seed:        the seed to pass to train_test_split().
 
     Returns:
-      (x_train, y_train), (x_val, y_val), (x_test, y_test) : the 3 sub-dataset.
+      (x_train, y_train), (x_val, y_val), (x_test, y_test) : the 3 sub-dataset as 3 tuples.
     '''
 
     if round(frac_train + frac_val + frac_test, 5) != 1.0:
