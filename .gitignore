@@ -21,3 +21,4 @@ models/
 ObjectDetection/Training/Results/*.jpg
 ObjectDetection/Training/YOLO-trained/*
 *.pt
+
