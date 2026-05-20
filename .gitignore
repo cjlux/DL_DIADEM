@@ -13,7 +13,7 @@ wheels/
 Data/
 .vscode
 .ipynb_checkpoints/
-#uv.lock
+uv.lock
 models/
 *.keras
 *.h5
