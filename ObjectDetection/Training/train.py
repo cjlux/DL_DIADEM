@@ -32,7 +32,7 @@ yolo_model = model_dir / 'yolov8n.pt'  # yolov8n.pt, yolov8s.pt, yolov8m.pt, yol
 #
 SEED  = 1234
 BATCH = 16
-EPOCH = 30
+EPOCH = 20
 IMG_SIZE  = 512
 PATIENCE  = 10
 DATA_PATH = './Data/data.yaml'
