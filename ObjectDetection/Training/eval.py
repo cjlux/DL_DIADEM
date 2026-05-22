@@ -30,7 +30,7 @@ curr_dir   = Path.cwd()
 #
 SEED  = 1234
 BATCH = 16
-EPOCH = 20
+EPOCH = 30
 IMG_SIZE  = 512
 PATIENCE  = 10
 DATA_PATH = './Data/data.yaml'

@@ -32,7 +32,7 @@ yolo_model = model_dir / 'yolov8n.pt'  # yolov8n.pt, yolov8s.pt, yolov8m.pt, yol
 #
 SEED  = 1234
 BATCH = 16
-EPOCH = 20
+EPOCH = 30
 IMG_SIZE  = 512
 PATIENCE  = 10
 DATA_PATH = './Data/data.yaml'
@@ -59,7 +59,7 @@ model.train(data=DATA_PATH,
             exist_ok=True, 
             pretrained=True,
             optimizer='auto', 
-            seed=1234,
+            seed=SEED,
             verbose=False)
 
 

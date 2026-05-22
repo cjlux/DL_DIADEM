@@ -31,7 +31,7 @@ curr_dir   = Path.cwd()
 #
 SEED  = 1234
 BATCH = 16
-EPOCH = 20
+EPOCH = 30
 
 PROJECT_PATH = curr_dir / 'Training' / 'YOLO-trained' 
 PROJECT_NAME = f'batch-{BATCH:02d}_epo-{EPOCH:03d}'
